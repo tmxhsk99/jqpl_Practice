@@ -13,6 +13,7 @@ public class JpaMain {
         try {
             Member member = new Member();
             member.setUsername("member1");
+            member.setAge(20);
             em.persist(member);
 
             /*
@@ -38,6 +39,24 @@ public class JpaMain {
                     .getSingleResult();
             System.out.println("singleResult = " + singleResult.getUsername());*/
             //
+            //프로젝션 - 여러값 조회
+            // 1. Query 타입으로 조회
+            //Query query = em.createQuery("SELECT m.username, m.age FROM Member m");
+            // 2. Object[] 타입으로 조회
+            /*List resultList = query.getResultList();
+            Object object = resultList.get(0);
+            Object[] objArr = (Object[]) object;
+            for (Object o : objArr) {
+                System.out.println("o = " + o);
+            }*/
+            // 3. new 명령어로 조회
+            // 단순값을 DTO로 바로 조히 , 순서와 타입이 일치하는 생성자 필요 , 패키지명을 포함한 전체 클래스명 입력
+            /*Query query = em.createQuery("SELECT new jpql.UserDTO(m.username,m.age) FROM Member m");
+            List<UserDTO> resultList = query.getResultList();
+            for (UserDTO userDTO : resultList) {
+                System.out.println("username= " + userDTO.getUsername());
+                System.out.println("userAge = " + userDTO.getAge());
+            }*/
 
         } catch (Exception e) {
             tx.rollback();

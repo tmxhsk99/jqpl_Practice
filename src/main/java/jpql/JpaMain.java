@@ -159,6 +159,28 @@ public class JpaMain {
                 }
             }
             tx.commit();*/
+            //조인 - ON 절
+            // ON 절을 활용한 조인 (JPA 2.1 부터 지원)
+            // 1. 조인 대상 필터링
+            /*
+            String filteringJPQL = "SELECT m  FROM Member m INNER JOIN m.team t ON t.name = 'Team1'";
+            List<Member> resultList = em.createQuery(filteringJPQL, Member.class).getResultList();
+            for (Member member : resultList) {
+                printMemberAndTeam(member);
+            }
+            tx.commit();
+            */
+            // 2. 연관관계 없는 엔티티 외부 조인
+           /* String setaOuterJPQL = "SELECT m,t FROM Member m JOIN m.team t ON m.username = 'Team2'";
+            List resultList = em.createQuery(setaOuterJPQL).getResultList();
+            for (Object o : resultList) {
+                Object[] objectArr = (Object[]) o;
+                System.out.println("ObjectArr [0] / Member = " + objectArr[0].toString());
+                Team tmpTeam =  (Team) objectArr[1];
+                System.out.println("ObjectArr [1] / Team = " + tmpTeam.getName());
+            }
+            tx.commit();*/
+
         } catch (Exception e) {
             tx.rollback();
             e.printStackTrace();
@@ -167,6 +189,18 @@ public class JpaMain {
             em.close();
         }
         emf.close();
+    }
+
+    private static void printMemberAndTeam(Member member) {
+        if (member != null && member.getTeam() != null) {
+            System.out.println(member.toString() + "/ TeamName : " + member.getTeam().getName());
+        }
+        if (member == null && member.getTeam() != null) {
+            System.out.println("Member is NULL / TeamName : " + member.getTeam().getName());
+        }
+        if (member.getTeam() == null && member != null) {
+            System.out.println(member.toString() + "/ TeamName is NULL");
+        }
     }
 
 

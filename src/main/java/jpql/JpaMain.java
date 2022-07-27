@@ -11,10 +11,10 @@ public class JpaMain {
         EntityTransaction tx = em.getTransaction();
         tx.begin();
         try {
-            Member member = new Member();
-            member.setUsername("member1");
-            member.setAge(20);
-            em.persist(member);
+//            Member member = new Member();
+//            member.setUsername("member1");
+//            member.setAge(20);
+//            em.persist(member);
 
             /*
             //1.결과가 여러개일 경우
@@ -57,6 +57,29 @@ public class JpaMain {
                 System.out.println("username= " + userDTO.getUsername());
                 System.out.println("userAge = " + userDTO.getAge());
             }*/
+            //4. 페이징 API
+            //JPA는 페이징을 다음 두 API로 추상화
+            //setFirstResult(int startPosition) : 조회 시작 위치 0부터 시작
+            //setMaxResult(int endPosition) : 조화할 데이터 수
+
+            //멤버를 생성한다.
+            for (int i = 0; i < 100; i++) {
+                Member member = new Member();
+                member.setUsername("member" + i);
+                member.setAge(i);
+                em.persist(member);
+            }
+            em.flush();
+            em.clear();
+            //멤버를 조회한다.
+            String jpql = "SELECT m from Member m order by m.username desc";
+            List<Member> resultList = em.createQuery(jpql, Member.class)
+                                        .setFirstResult(10)
+                                        .setMaxResults(20)
+                                        .getResultList();
+            for (Member member : resultList) {
+                System.out.println("member = " + member.toString());
+            }
 
         } catch (Exception e) {
             tx.rollback();

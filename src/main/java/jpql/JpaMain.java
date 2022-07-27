@@ -63,6 +63,7 @@ public class JpaMain {
             //setMaxResult(int endPosition) : 조화할 데이터 수
 
             //멤버를 생성한다.
+/*
             for (int i = 0; i < 100; i++) {
                 Member member = new Member();
                 member.setUsername("member" + i);
@@ -80,13 +81,102 @@ public class JpaMain {
             for (Member member : resultList) {
                 System.out.println("member = " + member.toString());
             }
+*/
+            //조인
 
+            //데이터 생성
+            // Team1 : member1 , member3 / Team2 : Team2(Member.class) / 팀 없음 : member2 / 멤버없는 팀 : noMemberTeam
+            Team team = new Team();
+            team.setName("Team1");
+            for (int i = 0; i < 4; i++) {
+                if (i != 3) {
+                    Member member = new Member();
+                    member.setUsername("member" + i);
+                    member.setAge(10 + i);
+                    if (isEven(i)) {
+                        member.setTeam(team);
+                        team.changeTeam(member);
+                        em.persist(team);
+                    }
+                    em.persist(member);
+                }
+
+                if (i == 3) {
+                    Member member = new Member();
+                    member.setUsername("Team2");
+                    member.setAge(10 + i);
+                    Team team2 = new Team();
+                    team2.setName("Team2");
+                    team2.changeTeam(member);
+                    member.setTeam(team2);
+                    em.persist(team2);
+                    em.persist(member);
+                }
+            }
+            Team team3 = new Team();
+            team3.setName("noMemberTeam");
+            em.persist(team3);
+
+
+            //1. 내부 조인 : 해당 조건에 해당하는 컬럼만 표시됨 , 없으면 표시되지 않음
+           /* String innerJoinjpql = "SELECT m FROM Member m INNER JOIN m.team t";
+            List<Member> resultList = em.createQuery(innerJoinjpql, Member.class).getResultList();
+            for (Member member : resultList) {
+                System.out.println(member.toString() + "TeamName : " + member.getTeam().getName());
+            }
+            tx.commit();*/
+
+            //2. 외부 조인 (LEFT 조인) : 왼쪽테이블을 모두 select 하고 오른쪽 테이블의 값이 없는 경우는 NULL로 둔다 RIGHT인 경우 반대로 조회된다.
+            /*
+            String outerJoinJpql = "SELECT m FROM Member m LEFT OUTER JOIN m.team t";
+            List<Member> resultList = em.createQuery(outerJoinJpql, Member.class).getResultList();
+            for (Member member : resultList) {
+                if (member != null && member.getTeam() != null) {
+                    System.out.println(member.toString() + "/ TeamName : " + member.getTeam().getName());
+                }
+                if(member == null && member.getTeam() != null){
+                    System.out.println("Member is NULL / TeamName : " + member.getTeam().getName());
+                }
+                if(member.getTeam() == null && member != null){
+                    System.out.println(member.toString() + "/ TeamName is NULL");
+                }
+            }
+            tx.commit();
+            */
+
+            //3. 세타 조인 : 통칭 막조인 , 새로운 조건값에 해당하는 값을 조인한다.
+            /*String setaJoinJpql = "SELECT m FROM Member m , Team t where m.username = t.name";
+            List<Member> resultList = em.createQuery(setaJoinJpql, Member.class).getResultList();
+            for (Member member : resultList) {
+                if (member != null && member.getTeam() != null) {
+                    System.out.println(member.toString() + "/ TeamName : " + member.getTeam().getName());
+                }
+                if (member == null && member.getTeam() != null) {
+                    System.out.println("Member is NULL / TeamName : " + member.getTeam().getName());
+                }
+                if (member.getTeam() == null && member != null) {
+                    System.out.println(member.toString() + "/ TeamName is NULL");
+                }
+            }
+            tx.commit();*/
         } catch (Exception e) {
             tx.rollback();
             e.printStackTrace();
         } finally {
             em.clear();
+            em.close();
         }
         emf.close();
+    }
+
+
+    /**
+     * 짝수인 경우 true 반환 짝수인경우 false 반환
+     *
+     * @param i
+     * @return
+     */
+    private static boolean isEven(int i) {
+        return i % 2 == 0;
     }
 }

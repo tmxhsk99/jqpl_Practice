@@ -14,7 +14,12 @@ public class Team {
     private String name;
     @OneToMany(mappedBy = "team")
     private List<Member> members = new ArrayList<>();
-
+    
+    //연관관계 편의 메서드 생성
+    public void changeTeam(Member member){
+        members.add(member);
+        member.setTeam(this);
+    }
     public Long getId() {
         return id;
     }

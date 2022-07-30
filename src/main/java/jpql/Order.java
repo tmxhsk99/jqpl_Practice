@@ -11,6 +11,9 @@ public class Order {
     @Embedded
     private Address address;
 
+    @ManyToOne
+    @JoinColumn(name = "MEMBER_ID")
+    private Member member;
 
     @ManyToOne
     @JoinColumn(name = "PRODUCT_ID")
@@ -46,5 +49,14 @@ public class Order {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Member getMember() {
+        return member;
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
+        member.addOrder(this);
     }
 }

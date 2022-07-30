@@ -93,11 +93,17 @@ public class JpaMain {
                     Member member = new Member();
                     member.setUsername("member" + i);
                     member.setAge(10 + i);
+
+                    Order order = new Order();
+                    order.setMember(member);
+                    order.setOrderAmount(3);
+
                     if (isEven(i)) {
                         member.setTeam(team);
                         team.changeTeam(member);
                         em.persist(team);
                     }
+                    em.persist(order);
                     em.persist(member);
                 }
 
@@ -180,6 +186,54 @@ public class JpaMain {
                 System.out.println("ObjectArr [1] / Team = " + tmpTeam.getName());
             }
             tx.commit();*/
+            // 서브 쿼리
+            // 나이가 평균보다 많은 회원
+            // Alias 를 사용할때 서브쿼리과 메인 쿼리의 는 다르게 사용해야 성능적으로 이슈가 적다
+            /*String subQueryJPQL1 = "SELECT m FROM Member m WHERE m.age > (SELECT avg(m2.age) from Member m2)";
+            List<Member> resultList = em.createQuery(subQueryJPQL1, Member.class).getResultList();
+            for (Member member : resultList) {
+                System.out.println(member.toString());
+            }
+            tx.commit();*/
+
+            // 한건이라도 주문을 한 고객
+           /* String subQueryJPQL2 = "SELECT m FROM Member m WHERE (select count(o) from Order o where m = o.member) > 0";
+            List<Member> resultList = em.createQuery(subQueryJPQL2, Member.class).getResultList();
+
+            if(resultList.size() == 0){
+                System.out.println("order is null");
+            }
+            for (Member member : resultList) {
+                System.out.println("member = " + member.toString());
+            }
+            tx.commit();*/
+
+            //기본 CASE식
+            /*
+            String basicCaseJPQL = "select " +
+                    "case when m.age <= 10 then '학생요금' " +
+                    "when m.age >= 20 then '경로요금'" +
+                    "else '일반요금' end  " +
+                    "FROM Member m";
+            List<String> resultList = em.createQuery(basicCaseJPQL, String.class).getResultList();
+            for (String s : resultList) {
+                System.out.println("s = " + s);
+            }
+            tx.commit();*/
+
+            //단순 CASE 식
+            String caseJPQL = "select case t.name " +
+                    "when 'Team1' then '인센티브 110%'" +
+                    "when 'Team2' then '인센티브 120%'" +
+                    "else '인센티브 105%'" +
+                    "end " +
+                    "from Team t";
+            List<String> resultList = em.createQuery(caseJPQL, String.class).getResultList();
+            for (String s : resultList) {
+                System.out.println("s = " + s);
+            }
+            tx.commit();
+
 
         } catch (Exception e) {
             tx.rollback();

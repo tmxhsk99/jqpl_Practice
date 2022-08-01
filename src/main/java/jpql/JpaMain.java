@@ -263,6 +263,13 @@ public class JpaMain {
             tx.commit();*/
 
 
+            //벌크 연산 예제
+            System.out.println("벌크 연산 시작");
+            int updateCount = em.createQuery("update Member m set m.age = 20").executeUpdate();
+            System.out.println("updateCount = " + updateCount);
+            tx.commit();
+
+
         } catch (Exception e) {
             tx.rollback();
             e.printStackTrace();

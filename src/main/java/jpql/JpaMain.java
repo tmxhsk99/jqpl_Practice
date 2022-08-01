@@ -122,7 +122,8 @@ public class JpaMain {
             Team team3 = new Team();
             team3.setName("noMemberTeam");
             em.persist(team3);
-
+            em.flush();
+            em.clear();
 
             //1. 내부 조인 : 해당 조건에 해당하는 컬럼만 표시됨 , 없으면 표시되지 않음
            /* String innerJoinjpql = "SELECT m FROM Member m INNER JOIN m.team t";
@@ -222,7 +223,7 @@ public class JpaMain {
             tx.commit();*/
 
             //단순 CASE 식
-            String caseJPQL = "select case t.name " +
+/*            String caseJPQL = "select case t.name " +
                     "when 'Team1' then '인센티브 110%'" +
                     "when 'Team2' then '인센티브 120%'" +
                     "else '인센티브 105%'" +
@@ -232,8 +233,28 @@ public class JpaMain {
             for (String s : resultList) {
                 System.out.println("s = " + s);
             }
-            tx.commit();
+            tx.commit();*/
+            //fetch Join
+            //엔티티 페치 조인 회원 조회를 하면서 연관된 팀도 함께 조회(SQL 한번에)
+            /*String fetchJoin = "select m from Member m join fetch m.team";
+            List<Member> resultList = em.createQuery(fetchJoin, Member.class).getResultList();
+            for (Member member : resultList) {
+                //팀정보 까지 들어갔는지 확인한다.
+                System.out.println("member = " + member.toString());
+                System.out.println("member = " + member.getTeam().getName());
+            }
+            tx.commit();*/
 
+            //컬렉션 페치 조인
+            //String collectionFetchJoin = "select t from Team t join fetch t.members where t.name = 'Team1'";
+            //String collectionFetchJoin = "select t from Team t join fetch t.members";
+            //distinct 사용
+            /*String collectionFetchJoin = "select distinct t from Team t join fetch t.members";
+            List<Team> resultList = em.createQuery(collectionFetchJoin, Team.class).getResultList();
+            for (Team team1 : resultList) {
+                System.out.println(team1.getName() + " | " + team1.getMembers().size());
+            }
+            tx.commit();*/
 
         } catch (Exception e) {
             tx.rollback();

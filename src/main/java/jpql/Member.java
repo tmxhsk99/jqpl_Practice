@@ -5,26 +5,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NamedQuery(
+        name = "Member.findByUsername",
+        query = "select m from Member m where m.username = :username"
+)
 public class Member {
     @Id
     @GeneratedValue
     private Long id;
-    @Column(name="NAME")
+    @Column(name = "NAME")
     private String username;
     private int age;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEAM_ID")
     private Team team;
 
-    @OneToMany (mappedBy = "member")
+    @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
 
     public List<Order> getOrders() {
         return orders;
     }
 
-    public void addOrder(Order order){
+    public void addOrder(Order order) {
         this.orders.add(order);
     }
 

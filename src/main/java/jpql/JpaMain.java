@@ -255,6 +255,13 @@ public class JpaMain {
                 System.out.println(team1.getName() + " | " + team1.getMembers().size());
             }
             tx.commit();*/
+            //Named Query 사용 어노테이션
+            /* List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class).setParameter("username","member0").getResultList();
+            for (Member member : resultList) {
+                System.out.println("member = " + member.toString());
+            }
+            tx.commit();*/
+
 
         } catch (Exception e) {
             tx.rollback();
